@@ -27,9 +27,19 @@ var userSchema = mongoose.Schema({
         token        : String,
         email        : String,
         name         : String
+    },
+    token        : String,
+    settings         : {
+        role         : String
+    },
+    mostRecentLoc             : {
+        type: {type: String},
+        coordinates: [Number]
     }
 
 });
+
+userSchema.index({ mostRecentLoc: '2dsphere', name: 1 });
 
 // methods ======================
 // generating a hash

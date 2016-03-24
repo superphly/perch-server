@@ -26,6 +26,7 @@
     "express-session": "^1.13.0",
     "jasmine-node": "^1.14.5",
     "jquery": "^2.2.1",
+    "jsonwebtoken": "^5.7.0",
     "method-override": "^2.3.5",
     "mongodb": "^2.1.7",
     "mongoose": "^4.4.7",
@@ -34,13 +35,16 @@
     "passport": "^0.3.2",
     "passport-facebook": "^2.1.0",
     "passport-google-oauth": "^1.0.0",
+    "passport-http-bearer": "^1.0.1",
     "passport-local": "^1.0.0",
     "passport-twitter": "^1.0.4",
+    "promise": "^7.1.1",
     "rbush": "^1.4.2",
     "request": "^2.69.0",
     "socket.io": "^1.4.5"
   },
   "devDependencies": {
+    "frisby": "^0.8.5",
     "jasmine-node": "^1.14.5"
   }
 }

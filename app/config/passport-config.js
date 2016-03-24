@@ -3,6 +3,7 @@ var LocalStrategy    = require('passport-local').Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy;
 var TwitterStrategy  = require('passport-twitter').Strategy;
 var GoogleStrategy   = require('passport-google-oauth').OAuth2Strategy;
+var BearerStrategy = require('passport-http-bearer').Strategy //token authentication strategy from http://jeroenpelgrims.com/token-based-sessionless-auth-using-express-and-passport/
 
 // load up the user model
 var User       = require('../app/models/user');
@@ -29,6 +30,10 @@ module.exports = function(passport) {
             done(err, user);
         });
     });
+
+// ^^^^^^^^^^^^^ THIS NEEDS TO CHANGE ^^^^^^^^^^^^^^^^^^^^^^
+// NOTE: passport session setup needs to use token authentication rather than session-based
+// ^^^^^^^^^^^^^ THIS NEEDS TO CHANGE ^^^^^^^^^^^^^^^^^^^^^^
 
     // =========================================================================
     // LOCAL LOGIN =============================================================

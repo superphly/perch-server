@@ -9,13 +9,13 @@ var passport = require('passport');
 var nodemailer = require('nodemailer');
 var socketio = require('socket.io');
 
-
 var flash    = require('connect-flash');
 var morgan       = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
 var session      = require('express-session');
 
+var http		 = require('http');
 
 
 // =========== CONFIGURE MONGOOSE  =============== //
@@ -35,18 +35,21 @@ mongoose.connect(dbURI);
 	app.set('view engine', 'ejs'); // set up ejs for templating
 
 // ========== set up PASSPORT ========================== //
-	app.use(session({ secret: 'ilovescotchscotchyscotchscotch' })); // session secret
+	app.use(session({ secret: 'thenisawanewheavenandanewearth' })); // session secret
 	app.use(passport.initialize());
 	app.use(passport.session()); // persistent login sessions
 	app.use(flash()); // use connect-flash for flash messages stored in session
 
+// ^^^^^^^^^^^^^ THIS NEEDS TO CHANGE ^^^^^^^^^^^^^^^^^^^^^^
+// NOTE: passport setup needs to use token-based authentication rather than session-based
+// ^^^^^^^^^^^^^ THIS NEEDS TO CHANGE ^^^^^^^^^^^^^^^^^^^^^^
 
 
 //////////// CONFIGURE ROUTES /////////////
-require('./routes.js')(app, passport); // load our routes and pass in our app and fully configured passport
+require('./routes.js')(app, passport, express); // load our routes and pass in our app and fully configured passport
 
 // ========== CONFIGURE API ROUTES ================//
-require('./api/v1/apiroutes.js')(app, express);
+require('./api/v1/apiroutes.js')(app, passport, express, http);
 
 
 //////////// CONFIGURE LAUNCH /////////////
