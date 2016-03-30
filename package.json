@@ -8,7 +8,8 @@
     "test": "./node_modules/.bin/jasmine-node spec"
   },
   "engines": {
-	"npm": ">=2.1.0 < 3.8.3"
+    "node": "5.6.0",
+    "npm": "3.7.x"
   },
   "repository": {
     "type": "git",
