@@ -23,6 +23,8 @@
 
 //required modules
 
+"use strict";
+
 const https = require('https');
 // get the required models
 var Ping         = require('../../../models/ping.js');
@@ -34,6 +36,8 @@ var Promise = require('promise');
 
 //include vr = true for a verbose response, given as an array of messages at {msg = [msg1, msg2...]}.
 
+let jasmineWorking = true;
+
 var validateRequest = function(req, res) {
 	return new Promise(function(resolve, reject){
 
@@ -44,6 +48,7 @@ var validateRequest = function(req, res) {
 			pR.req = postRequest;
 			pR.status = 202;
 			pR.vr = true;
+			pR.SSID = {lat: 0, lng: 0};
 		//if(postRequest.vr) pR.vr = true; //verbose response
 		if(pR.vr) {pR.msg = ["Verbose messaging enabled. Processing Ping request."]
 			} else {pR.msg = "Enable verbose messaging with {vr = true}"};
@@ -57,7 +62,6 @@ var validateRequest = function(req, res) {
 			) 
 			{
 				pR.req.valid = true;
-				pR.SSID = {};
 				pR.SSID.value = pR.req.SSID;
 				pR.macAddress = {};
 				pR.macAddress.value = pR.req.macAddress;
@@ -89,11 +93,13 @@ var recordPing = function(pR) {
 					newPing.macAddress = pR.req.macAddress;
 					newPing.SSID = pR.SSID.value;
 					//record ping
-
-						//...CODE SHOULD GO HERE!!!...//
-
-					//resolve pR for next promise
-					pR.status = 200;
+					newPing.save(function(err) {
+						if (err)
+                            throw err;
+					});
+                    pR.msg.status = 202;
+                    if(pR.vr) pR.msg.push(pR.msg.status + 'Ping recorded.');
+                    if(pR.vr) console.log(pR.msg);
 					resolve(pR)
 					//error handling
 					if(!newPing) throw "internal error: failed to record Ping.";
@@ -108,17 +114,30 @@ var recordPing = function(pR) {
 
 var checkForLocation = function(pR) {
 	return new Promise(function(resolve, reject){
+		console.log('checking location: ' + pR.location);
+		if(pR.vr) pR.msg.push("checking for location...");
 		//lookup location here !!!
-		try{//lookup location
-			var location = undefined;
-			if(location === undefined) throw "Could not find location in database, checking geolocation APIs";
+		try{
+			//lookup location by MAC Address
+			//construct query
+			var locQuery = Location.findOne( {'wifi.macAddress': pR.macAddress.value });
+			//execute query
+			locQuery.exec(function(err, queryLocation) {
+				if(err) throw err;
+				return queryLocation;
+
+			});
+
+			if(locQuery === null) throw "Could not find location in database, checking geolocation APIs";
+			console.log(locQuery);
 			pR.location.inDatabase = true;
-			pR.location.location = location.name;
-			pR.location.msg = "You checked in at..." + location.name;
-			pR.location.lat = location.lat;
-			pR.location.lng = location.lng;
-			pR.msg = "Found location in database. Checking for users.";
+			pR.location.location = locQuery.location;
+			pR.location.alternateLocs = locQuery.alternateLocs;			
+			pR.status = 202;
+			if(pR.vr) pR.msg.push("Found location in database. Checking for users.");
 			resolve(pR);
+
+			//if the location is not in the database, throw error and lookup on API.
 		} catch(e) {
 			pR.location.inDatabase = false;
 			pR.msg.push(e);
@@ -172,6 +191,7 @@ var geoRequest = function(pR) {
 				geoResponseJSON = JSON.parse(geoResponseBody);
 				//store lat and lng
 				console.log('locations returned:' + geoResponseBody);
+				console.log(pR);
 				pR.SSID.lat = geoResponseJSON.location.lat;
 				pR.SSID.lng = geoResponseJSON.location.lng;
 				//store accuracy
@@ -274,6 +294,58 @@ var searchRequest = function(pR) {
 	});
 };
 
+var saveLocations = function(pR) {
+	return new Promise(function(resolve, reject){
+		try{
+			var newLocation = new Location();
+			newLocation.wifi = {
+				macAddress: pR.macAddress.value,
+				SSID 	: 	pR.SSID.value,
+				lat 	: 	pR.SSID.lat,
+				lng 	: 	pR.SSID.lng,
+				acc 	: 	pR.SSID.acc
+			};
+			newLocation.location = pR.location.location;
+			newLocation.alternateLocs = pR.possibleLocs;
+			newLocation.createDate = Math.floor(new Date() / 1000);
+			newLocation.createdBy = pR.req.user;
+			newLocation.save(function(err) {
+				if (err) throw err;
+				pR.status = 202;
+				pR.msg.push(pR.status+': ')
+				return done(null, newLocation);
+			});
+
+			resolve(pR);
+		} catch(err) {
+			pR.status = 500;
+			pR.msg.push(pR.status + ": Couldn't record location. " + err);
+			reject(pR);
+
+		}
+
+
+	});
+};
+
+function geoQuery(lat, lng) {
+	this.coords = [lat, lng];
+	this.options = {};
+};
+
+geoQuery.prototype.geoNearOptions = function(options)
+	{
+		let that = this;
+		that.options = options;
+		return that;
+	};
+
+geoQuery.prototype.returnUsers = function() {
+
+	let userArray = ['test'];
+	return userArray;
+};
+
 
 var getNearbyUsers = function(pR) {
 	return new Promise(function(resolve, reject){
@@ -298,10 +370,18 @@ var geoPing = function(req, res) {
 			.catch(err2 => {
 				return geoRequest(err2)
 					.then(val3 => {
-						return searchRequest(val3);
+						return searchRequest(val3)
+						.then(val3A => {
+							return saveLocations(val3A);
+						})
+						.catch(err3A => {
+							console.log(err3A)
+							return err3A;
+						});
 					})
 					.catch(err3 => {
 						console.log(err3);
+						return err3;
 					})
 				})
 			.then(val4 => {
@@ -309,10 +389,10 @@ var geoPing = function(req, res) {
 			})
 		.then(val5 => {
 			val5.msg.push('sending server response');
-			val5.status=200;
+			if(val5.status === 200 || val5.status === 202) val5.status = 200;
 			console.log(val5.msg);
 			res.status(val5.status).json(val5); //send response
 		});
 	};
 
-exports.geoPing = geoPing;
+module.exports.geoPing = geoPing;

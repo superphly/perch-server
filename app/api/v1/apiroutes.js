@@ -32,7 +32,9 @@ module.exports = function(app, passport, express, http) {
 	var pingPost = require('./modules/pingPost.js');
 	var geoPing = pingPost.geoPing;
 
-	api.post('/ping', apiAuth, function(req, res){geoPing(req, res)}); //uses the geoPing function chain at pingPost.js. Check ./modules
+	api.post('/ping', /*apiAuth, */function(req, res){geoPing(req, res)}); //uses the geoPing function chain at pingPost.js. Check ./modules
+
+	//user updates a location
 
 
 	// REGISTER OUR ROUTES -------------------------------

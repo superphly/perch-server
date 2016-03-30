@@ -1,4 +1,6 @@
 
+/*"use strict";
+
 var frisby = require('frisby');
 var apiroutes = require('../app/api/v1/apiroutes.js');
 apiroutes.apiAuth = function(req, res, next) {return next()};
@@ -23,9 +25,10 @@ describe("Authentication should be required here.", function() {
 			{
 				user: "John Backes",
 				timestamp: Math.floor(new Date() / 1000),
-				macAddress: ["5c:a3:9d:18:f:1a", "0:1c:23:e2:9a:44"],
+				macAddress: ["0:1c:23:e2:9a:44", "5c:a3:9d:18:f:1a"],
 				SSID: "Joule Lobby",
-				token: "oiwejfoiwjefoiwejf"
+				token: "oiwejfoiwjefoiwejf",
+				vr 	: 	true 
 			})
 		.expectStatus(200)
 		.inspectBody()
@@ -36,5 +39,9 @@ describe("Authentication should be required here.", function() {
 		.toss();
 
 
-})
+});
 
+
+
+
+*/
