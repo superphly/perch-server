@@ -6,9 +6,6 @@
   "scripts": {
     "test": "./node_modules/.bin/jasmine-node spec"
   },
-  "engines": {
-    "node": "5.6.0"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/superphly/perch-server.git"
