@@ -1,3 +1,5 @@
+"use strict";
+
 
 ///////////  REQUIREMENTS ///////////
 
@@ -18,10 +20,12 @@ var session      = require('express-session');
 var http		 = require('http');
 
 
+
 // =========== CONFIGURE MONGOOSE  =============== //
 
-var configDB = require('./config/env/mongoose-config.js');
-var dbURI = configDB.mongooseURI;
+//if using heroku, use the deployment configuration file. otherwise use the local /env/mongoose-config.js file.
+let configDB = process.env.herokuLive ? require('./config/auth-heroku.js') : require('./config/env/mongoose-config.js');
+let dbURI = configDB.mongooseURI;
 mongoose.connect(dbURI);
 
 

@@ -1,3 +1,5 @@
+"use strict";
+
 // app/models/ping.js
 // load the things we need
 var mongoose = require('mongoose');
@@ -18,7 +20,11 @@ var pingSchema = mongoose.Schema({
 pingSchema.methods.findLocation = function(macAddress, SSID) {
     // get the API key
     app.get('/ping/location', function(req, res) {
-        var apiKey = require('../config/env/auth.js').geoLocAPI.key;
+        let apiKey = process.env.herokuLive ? (
+            require('../config/auth-heroku.js').geoLocAPI.key
+            ):(
+            require('../config/env/auth.js').geoLocAPI.key
+            );
         var options = {
             host  :  'www.googleapis.com',
             path    : '/geolocation/v1/geolocate?key=' + apiKey,

@@ -1,3 +1,5 @@
+"use strict";
+
 // app/models/location.js
 // load the things we need
 var mongoose = require('mongoose');

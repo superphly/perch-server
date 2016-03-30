@@ -1,3 +1,5 @@
+"use strict";
+
 // ============!!!!!!!==========================
 // NOTE: THERE'S A LOT ON THIS PAGE THAT NEEDS TO CHANGE
 // ===== passport setup needs to use token-based authentication rather than session-based

@@ -1,4 +1,10 @@
-console.log("\nInitializing perched server...");
+"use strict";
+
+console.log("\nInitializing perched server on... " + determineEnv());
+function determineEnv() {
+	return process.env.herokuLive ? "Heroku": "Local";
+};
+
 
 // Get required components
 var server = require('./app/server.js');

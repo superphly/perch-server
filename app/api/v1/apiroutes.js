@@ -1,3 +1,5 @@
+"use strict";
+
 //app/api/v1/apiroutes.js
 
 

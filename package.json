@@ -4,7 +4,11 @@
   "description": "perch, a toolbar app for working together anywhere",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "./node_modules/.bin/jasmine-node spec"
+  },
+  "engines": {
+	"npm": ">=2.1.0 < 3.8.3"
   },
   "repository": {
     "type": "git",

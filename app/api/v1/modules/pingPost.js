@@ -168,7 +168,11 @@ var geoRequest = function(pR) {
 		//store geoLoc API response here
 		var latLng = {};
 		//Google API key
-		var apiKey = require('../../../config/env/auth.js').geoLocAPI.key;
+		let apiKey = process.env.herokuLive ? (
+			require('../../../config/auth-heroku.js').geoLocAPI.key
+			):(
+			require('../../../config/env/auth.js').geoLocAPI.key
+			);
 		//options for API request
 		var geoOptions = {
 			host  :  'www.googleapis.com',
@@ -229,7 +233,11 @@ var geoRequest = function(pR) {
 var searchRequest = function(pR) {
 	return new Promise(function(resolve, reject){
 		//Google API key
-		var apiKey = require('../../../config/env/auth.js').geoLocAPI.key;
+		let apiKey = process.env.herokuLive ? (
+			require('../../../config/auth-heroku.js').geoLocAPI.key
+			):(
+			require('../../../config/env/auth.js').geoLocAPI.key
+			);
 		//Configure parameters
 		if(pR.vr) console.info(pR.SSID.lat + ', ' + pR.SSID.lng);
 		var nearbySearchRequestParams = 'location='+pR.SSID.lat+','+pR.SSID.lng+'&radius='+pR.SSID.acc+'&rankby=prominence&key='+apiKey;

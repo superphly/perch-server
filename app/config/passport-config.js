@@ -1,3 +1,5 @@
+"use strict";
+
 // load all the things we need
 var LocalStrategy    = require('passport-local').Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy;
@@ -9,7 +11,11 @@ var BearerStrategy = require('passport-http-bearer').Strategy //token authentica
 var User       = require('../app/models/user');
 
 // load the auth variables
-var configAuth = require('./auth'); // use this one for testing
+let configAuth = process.env.herokuLive ? (
+    require('./auth-heroku.js') //deployment configuration file
+):( 
+    require('./auth.js') //local configuration file if !herokuLive variable
+);
 
 module.exports = function(passport) {
 
